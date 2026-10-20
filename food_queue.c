@@ -1,3 +1,4 @@
+//AashmitaNair 
 #include "food_queue.h"
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +40,7 @@ int food_queue_enqueue(FoodQueue *q, const FoodOffer *o) {
 
 int food_queue_peek(const FoodQueue *q, FoodOffer *out) {
     if (!q || !out || !q->front)
-    
+
         return 0;
     *out = q->front->offer;
     return 1;
