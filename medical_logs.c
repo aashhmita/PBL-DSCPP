@@ -2,11 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 void medical_log_init(MedicalLog *l)
-{
-    if (l)
-    {
-        l->head = l->tail = NULL;
-        l->size = 0;
+{ if (l)
+    { l->head = l->tail = NULL; l->size = 0;
     }
 }
 int medical_log_add(MedicalLog *l, int rid, int aid, const char *date, const char *note)
@@ -27,14 +24,13 @@ int medical_log_add(MedicalLog *l, int rid, int aid, const char *date, const cha
     if (l->tail)
         l->tail->next = r;
     else
-        l->head = r;
+     l->head = r;
     l->tail = r;
     l->size++;
     return 1;
 }
 int medical_log_delete(MedicalLog *l, int id)
-{
-    if (!l)
+{ if (!l)
         return 0;
     for (MedicalRecord *r = l->head; r; r = r->next)
         if (r->record_id == id)
@@ -73,10 +69,8 @@ void medical_log_free(MedicalLog *l)
         return;
     MedicalRecord *r = l->head;
     while (r)
-    {
-        MedicalRecord *n = r->next;
+    {MedicalRecord *n = r->next;
         free(r);
-        r = n;
-    }
+        r = n; }
     medical_log_init(l);
 }
