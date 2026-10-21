@@ -1,4 +1,4 @@
-#include "../backend/c_core/linkedlist/medical_log.h"
+#include "medical_log.h"
 #include <assert.h>
 int main(void)
 {
