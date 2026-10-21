@@ -4,8 +4,7 @@
 void medical_log_init(MedicalLog *l)
 { if (l)
     { l->head = l->tail = NULL; l->size = 0;
-    }
-}
+    }}
 int medical_log_add(MedicalLog *l, int rid, int aid, const char *date, const char *note)
 {
     if (!l || rid <= 0 || aid <= 0 || !date || !note || strlen(date) >= 16 || strlen(note) >= MEDICAL_NOTE_MAX)
@@ -56,11 +55,9 @@ int medical_log_copy(const MedicalLog *l, int aid, MedicalRecord *out, int cap)
     int n = 0;
     for (MedicalRecord *r = l->head; r && n < cap; r = r->next)
         if (aid == 0 || r->animal_id == aid)
-        {
-            out[n] = *r;
+        {out[n] = *r;
             out[n].prev = out[n].next = NULL;
-            n++;
-        }
+            n++; }
     return n;
 }
 void medical_log_free(MedicalLog *l)
