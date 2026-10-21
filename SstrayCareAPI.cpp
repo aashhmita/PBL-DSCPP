@@ -11,10 +11,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
-
-namespace {
-
-TriageHeap heap;
+namespace {TriageHeap heap;
 RouteGraph graph;
 AnimalHash animals;
 MedicalLog logs;
@@ -25,7 +22,6 @@ void initialize_all() {
     if (initialized) {
         return;
     }
-
     triage_init(&heap);
     route_graph_init(&graph);
     animal_hash_init(&animals);
