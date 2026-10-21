@@ -1,3 +1,4 @@
+
 #include "medical_log.h"
 #include <assert.h>
 
@@ -17,13 +18,21 @@ int main(void)
     MedicalRecord r[4];
     assert(medical_log_copy(&l, 10, r, 4) == 2);
     assert(r[0].record_id == 1 && r[1].record_id == 2);
-    assert(!medical_log_delete(&l, 99));
-    assert(l.size == 2);
+
     /* Test deleting a missing record */
     assert(!medical_log_delete(&l, 99));
     assert(l.size == 2);
 
+    /* Test deleting all records */
     assert(medical_log_delete(&l, 1));
+    assert(l.size == 1);
+
+    assert(medical_log_delete(&l, 2));
+    assert(l.size == 0);
+
+    /* Test deleting an already deleted record */
+    assert(!medical_log_delete(&l, 2));
+
     medical_log_free(&l);
 
     return 0;
