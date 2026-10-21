@@ -3,12 +3,9 @@ import ctypes
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 LIBRARY = os.path.join(ROOT, "build", "straycare.dll" if os.name == "nt" else "libstraycare.so")
-
-
 def load_api():
     if not os.path.exists(LIBRARY):
         raise FileNotFoundError(f"Shared library not found: {LIBRARY}\nBuild the project first (see README.md).")
@@ -27,7 +24,6 @@ def load_api():
     lib.sc_save.argtypes = [ctypes.c_char_p]; lib.sc_save.restype = ctypes.c_int
     lib.sc_load.argtypes = [ctypes.c_char_p]; lib.sc_load.restype = ctypes.c_int
     return lib
-
 class App(tk.Tk):
     def __init__(self, api):
         super().__init__(); self.api = api; self.title("STRAYCARE | Stray Animal Management"); self.geometry("760x620")
