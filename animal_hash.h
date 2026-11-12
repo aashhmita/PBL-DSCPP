@@ -1,4 +1,4 @@
-#ifndef ANIMAL_HASH_H
+#ifdef ANIMAL_HASH_H
 #define ANIMAL_HASH_H
 #define ANIMAL_BUCKETS 101
 typedef struct { int animal_id; char name[50]; char species[24]; char location[100]; } Animal;
