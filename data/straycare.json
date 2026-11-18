@@ -1,0 +1,196 @@
+{
+  "animals": [
+    {
+      "ID": "SC-1004",
+      "Name": "Troy",
+      "Species": "Dog",
+      "Location": "ISBT Dehradun",
+      "Condition": "Roadside emergency",
+      "Status": "Awaiting rescue",
+      "Urgency": "Critical",
+      "Reported": "2026-10-22"
+    },
+    {
+      "ID": "SC-1005",
+      "Name": "Kalum Soki",
+      "Species": "Dog",
+      "Location": "Clement town,Dehradun",
+      "Condition": "Needs Propper Treatment",
+      "Status": "Awaiting rescue",
+      "Urgency": "Critical",
+      "Reported": "2026-11-16"
+    }
+  ],
+  "food_offers": [
+    {
+      "Offer ID": "FD-201",
+      "Donor": "Green Bowl Cafe",
+      "Food": "Plain rice and vegetables",
+      "Servings": 18,
+      "Pickup area": "Clock Tower",
+      "Status": "Available"
+    },
+    {
+      "Offer ID": "FD-202",
+      "Donor": "Campus Canteen",
+      "Food": "Unseasoned leftovers",
+      "Servings": 12,
+      "Pickup area": "GEU",
+      "Status": "Cancelled"
+    },
+    {
+      "Offer ID": "FD-203",
+      "Donor": "Community Kitchen",
+      "Food": "Rice",
+      "Servings": 25,
+      "Pickup area": "Clement Town",
+      "Status": "Available"
+    },
+    {
+      "Offer ID": "FD-204",
+      "Donor": "Shree utsav",
+      "Food": "Plain Rice",
+      "Servings": 15,
+      "Pickup area": "Turner Road, Clement Town, 242008, Dehradun",
+      "Status": "Available"
+    }
+  ],
+  "medical_logs": [
+    {
+      "Date": "2026-11-16",
+      "Animal ID": "SC-1005",
+      "Treatment": "Assigned a care taker",
+      "Volunteer": "Sahil Pandey",
+      "Notes": "Needs to be held captive when drunk ..."
+    }
+  ],
+  "activity": [
+    {
+      "when": "2026-11-16T12:40:06",
+      "title": "Medical update recorded",
+      "detail": "SC-1005 • Assigned a care taker",
+      "status": "Updated"
+    },
+    {
+      "when": "2026-11-16T12:35:55",
+      "title": "Animal profile edited",
+      "detail": "SC-1004 • Troy",
+      "status": "Updated"
+    },
+    {
+      "when": "2026-11-16T12:35:38",
+      "title": "Animal profile edited",
+      "detail": "SC-1004 • Unknown puppy",
+      "status": "Updated"
+    },
+    {
+      "when": "2026-11-16T12:35:20",
+      "title": "Animal record deleted",
+      "detail": "SC-1003 • Brownie",
+      "status": "Deleted"
+    },
+    {
+      "when": "2026-11-16T12:35:15",
+      "title": "Animal record deleted",
+      "detail": "SC-1002 • Luna",
+      "status": "Deleted"
+    },
+    {
+      "when": "2026-11-16T12:35:07",
+      "title": "Animal record deleted",
+      "detail": "SC-1001 • Milo",
+      "status": "Deleted"
+    },
+    {
+      "when": "2026-11-16T12:34:48",
+      "title": "Animal profile added",
+      "detail": "SC-1005 • Kalum Soki",
+      "status": "Created"
+    },
+    {
+      "when": "2026-11-16T12:32:13",
+      "title": "Food offer updated",
+      "detail": "FD-202 • Cancelled",
+      "status": "Cancelled"
+    },
+    {
+      "when": "2026-11-16T12:31:47",
+      "title": "Food donation listed",
+      "detail": "FD-204 • Shree utsav",
+      "status": "Available"
+    },
+    {
+      "when": "2026-11-13T20:51:51",
+      "title": "Road map updated",
+      "detail": "geu ↔ rajpur road • 2 km",
+      "status": "Updated"
+    },
+    {
+      "when": "2026-10-22T09:15:00",
+      "title": "New emergency reported",
+      "detail": "SC-1004 • ISBT Dehradun",
+      "status": "Critical"
+    },
+    {
+      "when": "2026-10-21T17:40:00",
+      "title": "Medical update recorded",
+      "detail": "SC-1001 • Milo",
+      "status": "Updated"
+    },
+    {
+      "when": "2026-10-21T12:05:00",
+      "title": "Food donation listed",
+      "detail": "FD-203 • Community Kitchen",
+      "status": "Available"
+    }
+  ],
+  "roads": [
+    [
+      "Clement Town",
+      "ISBT Dehradun",
+      7.5
+    ],
+    [
+      "Clement Town",
+      "Prem Nagar",
+      5.5
+    ],
+    [
+      "Clock Tower",
+      "ISBT Dehradun",
+      3.5
+    ],
+    [
+      "Clock Tower",
+      "Prem Nagar",
+      6.0
+    ],
+    [
+      "Clock Tower",
+      "Sahastradhara Road",
+      8.0
+    ],
+    [
+      "Clock Tower",
+      "Shelter (Base)",
+      3.0
+    ],
+    [
+      "GEU",
+      "ISBT Dehradun",
+      6.5
+    ],
+    [
+      "GEU",
+      "Prem Nagar",
+      4.0
+    ],
+    [
+      "geu",
+      "rajpur road",
+      2.0
+    ]
+  ],
+  "next_animal_no": 1006,
+  "next_food_no": 205
+}
