@@ -1,0 +1,9 @@
+# Makes Streamlit's own theme match StrayCare's light design (the tables are drawn by Streamlit
+# itself, so CSS alone cannot recolour them). The text colours in app.py's stylesheet are pinned
+# separately, so the page stays readable even if someone switches Streamlit to its dark theme.
+[theme]
+base = "light"
+primaryColor = "#17695a"
+backgroundColor = "#f4f7f6"
+secondaryBackgroundColor = "#e4f4ec"
+textColor = "#172b2a"
