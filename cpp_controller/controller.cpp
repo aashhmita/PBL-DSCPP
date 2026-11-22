@@ -1,6 +1,7 @@
 #include "controller.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <cctype>
 #include <cerrno>
 #include <cmath>
@@ -812,27 +813,14 @@ void StrayCareController::add_road(const std::string &a_in, const std::string &b
 // dashboard
 // =========================================================================================
 
-std::vector<ActivityItem> std::vector<ActivityItem> StrayCareController::recent_activity(std::size_t limit) const const
+std::vector<ActivityItem> StrayCareController::recent_activity(std::size_t limit) const
 {
-    size_t count = std::min(limit, activity_.size());
-    return std::vector<ActivityItem>(activity_.begin(), activity_.begin() + static_cast<std::ptrdiff_t>(count));
-}
+    std::size_t count = std::min(limit, activity_.size());
 
-std::vector<ActivityItem> StrayCareController::all_activity() const
-{
-    return activity_;
-}
-
-Stats StrayCareController::stats() const
-{
-    Stats stats;
-    stats.animals = static_cast<long>(ah_size(animals_.get()));
-    for (const Animal &a : unsorted_animals()) {
-        if (status_in(a, OPEN_EMERGENCY)) stats.open_emergencies++;
-    }
-    stats.active_food_offers = static_cast<long>(fq_size(food_queue_.get()));
-    stats.medical_entries = static_cast<long>(ml_size(medical_.get()));
-    return stats;
+    return std::vector<ActivityItem>(
+        activity_.begin(),
+        activity_.begin() + static_cast<std::ptrdiff_t>(count)
+    );
 }
 
 // =========================================================================================
