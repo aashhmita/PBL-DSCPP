@@ -1,10 +1,3 @@
-/* food_queue.h : FIFO queue of food offers, built as a singly linked list.
- *
- * Food spoils, so the OLDEST active donation should be collected first.
- * Offers join at the tail and leave from the head; a pointer to each end keeps both O(1).
- *
- *   enqueue O(1)   dequeue O(1)   peek O(1)   remove from the middle O(n)
- */
 #ifndef FOOD_QUEUE_H
 #define FOOD_QUEUE_H
 
