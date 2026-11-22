@@ -523,3 +523,138 @@ class AccessTests(unittest.TestCase):
         self.assertEqual(len(backend.list_animals()), 6)
         self.assertEqual(len(backend.list_food_offers()), 4)
         self.assertEqual(len(backend.list_medical_entries("SC-1001")), 2)
+
+    # ---- name validation on the forms ----------------------------------------------
+    def test_forms_reject_numeric_names_with_a_clear_message(self):
+        self.make("user")
+        self.app.run("Animal Registry", {"Animal name / identifier": "123", "Location": "GEU"},
+                     clicked={"Add animal profile"})
+        self.assertTrue(any("cannot be only numbers" in m for m in self.app.messages("error")))
+        self.app.run("Rescue & Triage", {"Animal description": "Dog", "Exact area / landmark": "456"},
+                     clicked={"Submit rescue report"})
+        self.assertTrue(any("must contain letters" in m for m in self.app.messages("error")))
+        self.app.run("Food Donations", {"Donor / organization": "789", "Food description": "Rice", "Pickup area": "GEU",
+                                        "checkbox:I have checked that the food is appropriate for animal consumption.": True},
+                     clicked={"Add donation offer"})
+        self.assertTrue(any("must contain letters" in m for m in self.app.messages("error")))
+        self.assertEqual(len(self.app.backend().list_animals()), 4)
+        self.assertEqual(len(self.app.backend().list_food_offers()), 3)
+
+    # ---- what an ADMIN may do -----------------------------------------------------------
+    def test_admin_sees_everything(self):
+        self.make("admin")
+        for page in PAGES + ["User Management"]:
+            self.app.run(page)
+            self.assertEqual(self.app.messages("error"), [], page)
+        self.assertEqual(self.app.radio_options, PAGES + ["User Management"])
+        self.assertIn("ADMINISTRATOR", self.screen())
+
+    def test_admin_can_edit_status_food_and_roads(self):
+        self.make("admin")
+        with self.assertRaises(RerunSignal):
+            self.app.run("Rescue & Triage", {"selectbox:Select case": "SC-1001 — Milo", "New status": "Closed"},
+                         clicked={"Update case"})
+        self.assertEqual(self.app.backend().get_animal("SC-1001")["Status"], "Closed")
+        with self.assertRaises(RerunSignal):
+            self.app.run("Food Donations", {"selectbox:Status": "Cancelled", "selectbox:Offer": "FD-201 — Green Bowl Cafe"},
+                         clicked={"Save offer status"})
+        with self.assertRaises(RerunSignal):
+            self.app.run("Route Planner", {"First location": "Clock Tower", "Second location": "Rajpur Road",
+                                           "Distance (km)": 4.0}, clicked={"Save road"})
+        self.assertIn("Rajpur Road", self.app.backend().map_locations())
+
+    def test_admin_creates_accounts_and_new_user_can_sign_in(self):
+        self.make("admin")
+        inputs = {"Account username": "volunteer1", "Account password": "secret9", "selectbox:Account role": "user"}
+        with self.assertRaises(RerunSignal):
+            self.app.run("User Management", inputs, clicked={"Create account"})
+        self.assertEqual(self.app.users.role_of("volunteer1"), "user")
+        self.assertEqual(self.app.users.verify("volunteer1", "secret9"), "user")
+        self.app.run("User Management", {"Account username": "x", "Account password": "secret9"}, clicked={"Create account"})
+        self.assertTrue(self.app.messages("error"))                          # too-short username
+
+    def test_admin_resets_a_password(self):
+        self.make("admin")
+        self.app.users.add_user("helper", "oldpass1", "user")
+        with self.assertRaises(RerunSignal):
+            self.app.run("User Management", {"selectbox:Reset password for": "helper", "New password": "newpass1"},
+                         clicked={"Reset password"})
+        self.assertIsNone(self.app.users.verify("helper", "oldpass1"))
+        self.assertEqual(self.app.users.verify("helper", "newpass1"), "user")
+
+    def test_admin_deletes_an_account_only_after_confirming_and_not_themselves(self):
+        self.make("admin")
+        self.app.users.add_user("helper", "oldpass1", "user")
+        pick = {"selectbox:Account to delete": "helper"}
+        self.app.run("User Management", pick, clicked={"Delete account"})        # not ticked -> disabled
+        self.assertTrue(self.app.users.exists("helper"))
+        ticked = dict(pick, **{"checkbox:Yes, delete the account 'helper'": True})
+        with self.assertRaises(RerunSignal):
+            self.app.run("User Management", ticked, clicked={"Delete account"})
+        self.assertFalse(self.app.users.exists("helper"))
+        me = {"selectbox:Account to delete": "admin_tester", "checkbox:Yes, delete the account 'admin_tester'": True}
+        self.app.run("User Management", me, clicked={"Delete account"})
+        self.assertTrue(any("cannot delete the account you are signed in with" in m for m in self.app.messages("error")))
+        self.assertTrue(self.app.users.exists("admin_tester"))
+
+    def test_admin_data_tools_are_present(self):
+        self.make("admin")
+        self.app.run("Overview", {"checkbox:Yes, permanently erase every record": True}, clicked={"Erase all records"})
+        self.assertEqual(self.app.backend().list_animals(), [])
+
+
+@unittest.skipUnless(os.path.exists(BUNDLE), "single-file edition not built")
+class SingleFileAccessTests(AccessTests):
+    """The same sign-in and role tests against the standalone straycare_app.py."""
+    app_path = BUNDLE
+
+
+def _native_ready():
+    try:
+        from backend.native_bridge import load_library
+        load_library()
+        return True
+    except Exception:
+        return False
+
+
+@unittest.skipUnless(_native_ready(), "C/C++ library not built (run: python build.py)")
+class NativeUiSmokeTests(UiSmokeTests):
+    """The very same page tests, but app.py runs on the compiled C/C++ engine."""
+    engine = "native"
+
+    def test_native_engine_is_in_use_but_not_written_in_the_sidebar(self):
+        self.app.run("Overview")
+        self.assertEqual(self.app.backend().engine, "C/C++ native core")
+        captions = [str(c.args[0]) for c in self.app.st.caption.call_args_list if c.args]
+        self.assertFalse([c for c in captions if "engine" in c.lower() or "native" in c.lower()])
+
+
+class AutoFallbackTests(unittest.TestCase):
+    def test_python_engine_is_reported_and_missing_library_falls_back(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            app = AppRunner(tmp, "python")
+            app.run("Overview")
+            captions = [str(c.args[0]) for c in app.st.caption.call_args_list if c.args]
+            self.assertEqual(app.backend().engine, "Pure-Python backend")
+            self.assertFalse([c for c in captions if "engine" in c.lower() or "python backend" in c.lower()])
+
+            # engine "auto" with a library path that does not exist -> Python backend + a note
+            old = os.environ.get("STRAYCARE_LIB")
+            os.environ["STRAYCARE_LIB"] = os.path.join(tmp, "missing.so")
+            try:
+                auto = AppRunner(tmp, "auto")
+                auto.run("Overview")
+            finally:
+                if old is None:
+                    os.environ.pop("STRAYCARE_LIB", None)
+                else:
+                    os.environ["STRAYCARE_LIB"] = old
+            captions = [str(c.args[0]) for c in auto.st.caption.call_args_list if c.args]
+            self.assertEqual(auto.backend().engine, "Pure-Python backend")      # fell back silently
+            self.assertFalse([c for c in captions if "engine" in c.lower() or "library" in c.lower()])
+            self.assertEqual(auto.messages("error"), [])
+
+
+if __name__ == "__main__":
+    unittest.main()
