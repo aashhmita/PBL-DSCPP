@@ -84,6 +84,9 @@ void ml_foreach(const MedicalLog *log,
                 void (*callback)(const MedicalEntry *entry, void *context),
                 void *context)
 {
+    if (log == NULL || callback == NULL)
+        return;
+
     for (const MlNode *node = log->head; node; node = node->next) {
         callback(&node->entry, context);
     }
