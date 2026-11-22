@@ -105,3 +105,131 @@ class MinHeap:
                 break
             data[i], data[smallest] = data[smallest], data[i]
             i = smallest
+
+
+def _sequence_number(animal_id):
+    """'SC-1004' -> 1004. Used as a tie-breaker so equal urgencies stay first-come first-served."""
+    try:
+        return int(str(animal_id).split("-")[-1])
+    except ValueError:
+        return 0
+
+
+class TriageHeap:
+    """Priority queue of rescue cases: most urgent first, oldest first on ties.
+
+    Each entry is the tuple (urgency_rank, sequence_number, animal_id).
+    Tuples compare element by element, which gives exactly that ordering.
+    """
+
+    def __init__(self, animals=None):
+        entries = [self._entry(a) for a in (animals or [])]
+        self._heap = MinHeap(entries)
+
+    @staticmethod
+    def _entry(animal):
+        rank = URGENCY_RANK.get(animal["Urgency"], len(URGENCY_RANK))
+        return (rank, _sequence_number(animal["ID"]), animal["ID"])
+
+    def __len__(self):
+        return len(self._heap)
+
+    def push_case(self, animal):
+        self._heap.push(self._entry(animal))
+
+    def pop_case(self):
+        """Remove and return the animal ID of the most urgent case."""
+        return self._heap.pop()[2]
+
+    def peek_case(self):
+        """Return (without removing) the animal ID of the most urgent case."""
+        return self._heap.peek()[2]
+
+    def ordered_ids(self):
+        """All IDs from most to least urgent, without destroying the heap (heap-sort on a copy)."""
+        clone = self._heap.copy()
+        return [clone.pop()[2] for _ in range(len(clone))]
+
+
+# ======================================================================
+# BACKEND: animal_hash
+# ======================================================================
+class AnimalHashTable:
+    def __init__(self, capacity=8, max_load=0.75):
+        self._capacity = max(4, capacity)
+        self._max_load = max_load
+        self._buckets = [[] for _ in range(self._capacity)]
+        self._size = 0
+
+    # ---- hashing -------------------------------------------------------------
+    @staticmethod
+    def _hash_text(key):
+        """djb2 string hash (hash = hash * 33 + char), kept to 32 bits."""
+        h = 5381
+        for ch in str(key):
+            h = ((h << 5) + h + ord(ch)) & 0xFFFFFFFF
+        return h
+
+    def _index(self, key):
+        return self._hash_text(key) % self._capacity
+
+    # ---- core operations -----------------------------------------------------
+    def put(self, key, value):
+        bucket = self._buckets[self._index(key)]
+        for pair in bucket:
+            if pair[0] == key:          # key already present -> overwrite
+                pair[1] = value
+                return
+        bucket.append([key, value])
+        self._size += 1
+        if self._size / self._capacity > self._max_load:
+            self._resize()
+
+    def get(self, key, default=None):
+        for k, v in self._buckets[self._index(key)]:
+            if k == key:
+                return v
+        return default
+
+    def remove(self, key):
+        bucket = self._buckets[self._index(key)]
+        for i, pair in enumerate(bucket):
+            if pair[0] == key:
+                del bucket[i]
+                self._size -= 1
+                return True
+        return False
+
+    def _resize(self):
+        old_buckets = self._buckets
+        self._capacity *= 2
+        self._buckets = [[] for _ in range(self._capacity)]
+        for bucket in old_buckets:
+            for key, value in bucket:
+                self._buckets[self._index(key)].append([key, value])
+
+    # ---- conveniences --------------------------------------------------------
+    def __contains__(self, key):
+        return any(k == key for k, _ in self._buckets[self._index(key)])
+
+    def __len__(self):
+        return self._size
+
+    def items(self):
+        for bucket in self._buckets:
+            for key, value in bucket:
+                yield key, value
+
+    def values(self):
+        return [v for _, v in self.items()]
+
+    def keys(self):
+        return [k for k, _ in self.items()]
+
+    @property
+    def capacity(self):
+        return self._capacity
+
+    @property
+    def load_factor(self):
+        return self._size / self._capacity
