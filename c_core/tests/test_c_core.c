@@ -283,6 +283,9 @@ static void test_medical_log_invalid_inputs(void)
     MedicalLog *log = ml_create();
     CHECK(log != NULL);
 
+    CHECK(ml_size(NULL) == 0);
+    ml_clear(NULL);
+
     if (log == NULL)
         return;
 
