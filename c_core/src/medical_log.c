@@ -35,18 +35,23 @@ void ml_destroy(MedicalLog *log)
 
 int ml_append(MedicalLog *log, const MedicalEntry *entry)
 {
-   if (log == NULL || entry == NULL || entry->animal_id[0] == '\0' ||
-    entry->date[0] == '\0' ||
-    entry->treatment[0] == '\0')
-    return -1;
+    if (log == NULL || entry == NULL ||
+        entry->animal_id[0] == '\0' ||
+        memchr(entry->animal_id, '\0', sizeof entry->animal_id) == NULL)
+        return -1;
+
     MlNode *node = malloc(sizeof *node);
     if (!node) return -1;
+
     node->entry = *entry;
     node->next = NULL;
+
     if (log->tail) log->tail->next = node;
     else log->head = node;
+
     log->tail = node;
     log->size++;
+
     return 0;
 }
 
