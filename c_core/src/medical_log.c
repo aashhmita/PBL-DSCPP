@@ -52,7 +52,7 @@ size_t ml_remove_animal(MedicalLog *log, const char *animal_id)
 {
     /* Walk once with a pointer-to-pointer, unlinking every node of this animal.
        `link` always points at the pointer that leads to the current node. */
-    if(log == NULL||animal_id == NULL)
+    if(log == NULL||animal_id == NULL||animal_id == '\0')
         return 0;
     size_t removed = 0;
     MlNode **link = &log->head;
