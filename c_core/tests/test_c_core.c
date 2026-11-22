@@ -234,6 +234,7 @@ static void test_medical_log_keeps_order(void)
     for (int i = 0; i < 3; i++) {
         MedicalEntry e;
         memset(&e, 0, sizeof e);
+        sc_copy(e.animal_id, sizeof e.animal_id, "SC-101");
         sc_copy(e.treatment, sizeof e.treatment, treatments[i]);
         CHECK(ml_append(log, &e) == 0);
     }
