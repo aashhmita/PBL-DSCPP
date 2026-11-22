@@ -246,6 +246,36 @@ static void test_medical_log_keeps_order(void)
     ml_destroy(log);
 }
 
+static void test_medical_log_invalid_inputs(void)
+{
+    MedicalLog *log = ml_create();
+    CHECK(log != NULL);
+
+    if (log == NULL)
+        return;
+
+    MedicalEntry e;
+    memset(&e, 0, sizeof e);
+
+    sc_copy(e.animal_id, sizeof e.animal_id, "SC-101");
+
+    CHECK(ml_append(NULL, &e) == -1);
+    CHECK(ml_append(log, NULL) == -1);
+
+    e.animal_id[0] = '\0';
+    CHECK(ml_append(log, &e) == -1);
+    CHECK(ml_size(log) == 0);
+
+    CHECK(ml_remove_animal(NULL, "SC-101") == 0);
+    CHECK(ml_remove_animal(log, NULL) == 0);
+    CHECK(ml_remove_animal(log, "") == 0);
+
+    ml_foreach(NULL, NULL, NULL);
+    ml_foreach(log, NULL, NULL);
+
+    ml_destroy(log);
+}
+
 /* ---- route graph -------------------------------------------------------------------- */
 
 static RouteGraph *sample_graph(void)
@@ -373,6 +403,7 @@ int main(void)
     test_medical_log_keeps_order();
     test_medical_log_lifecycle();
     test_medical_log_remove_animal();
+    test_medical_log_invalid_inputs();
     test_graph_shortest_path_prefers_the_detour();
     test_graph_edge_cases();
     test_graph_dijkstra_all_distances_and_growth();
