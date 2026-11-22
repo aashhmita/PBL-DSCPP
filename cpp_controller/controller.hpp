@@ -16,6 +16,7 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -140,7 +141,7 @@ public:
     void add_road(const std::string &a, const std::string &b, double km);
 
     // ---- dashboard -------------------------------------------------------------------
-    std::vector<ActivityItem> recent_activity(size_t limit) const;
+    std::vector<ActivityItem> recent_activity(std::size_t limit) const;
     Stats stats() const;
 
     // ---- saving and loading support (used by the Python bridge) ----------------------
