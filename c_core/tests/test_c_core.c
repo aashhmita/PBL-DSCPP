@@ -276,6 +276,28 @@ static void test_medical_log_invalid_inputs(void)
     ml_destroy(log);
 }
 
+static void test_medical_log_remove_all_entries(void)
+{
+    MedicalLog *log = ml_create();
+    CHECK(log != NULL);
+
+    if (log == NULL)
+        return;
+
+    MedicalEntry e;
+    memset(&e, 0, sizeof e);
+    sc_copy(e.animal_id, sizeof e.animal_id, "SC-101");
+
+    CHECK(ml_append(log, &e) == 0);
+    CHECK(ml_append(log, &e) == 0);
+
+    CHECK(ml_remove_animal(log, "SC-101") == 2);
+    CHECK(ml_size(log) == 0);
+    CHECK(log->head == NULL);
+    CHECK(log->tail == NULL);
+
+    ml_destroy(log);
+}
 /* ---- route graph -------------------------------------------------------------------- */
 
 static RouteGraph *sample_graph(void)
@@ -404,6 +426,7 @@ int main(void)
     test_medical_log_lifecycle();
     test_medical_log_remove_animal();
     test_medical_log_invalid_inputs();
+    test_medical_log_remove_all_entries();
     test_graph_shortest_path_prefers_the_detour();
     test_graph_edge_cases();
     test_graph_dijkstra_all_distances_and_growth();
