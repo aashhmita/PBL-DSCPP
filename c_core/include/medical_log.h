@@ -1,10 +1,14 @@
-/* medical_log.h : chronological treatment history, a singly linked list with a tail pointer.
+
+/* medical_log.h : chronological treatment history using a singly linked list.
  *
- * History is only ever appended (never rewritten), so appending at the tail is O(1) and
- * walking the list from the head gives the entries oldest -> newest.
+ * New records are appended at the tail, maintaining insertion order.
+ * Traversing from head displays records from oldest to newest.
  *
- *   append O(1)   walk O(n)
+ * Time complexity:
+ * Append: O(1)
+ * Traversal: O(n)
  */
+
 #ifndef MEDICAL_LOG_H
 #define MEDICAL_LOG_H
 
@@ -15,26 +19,41 @@
 extern "C" {
 #endif
 
+/* Node containing one medical record */
 typedef struct MlNode {
     MedicalEntry entry;
     struct MlNode *next;
 } MlNode;
 
+/* Medical log with head, tail and entry count */
 typedef struct {
     MlNode *head;
     MlNode *tail;
     size_t size;
 } MedicalLog;
 
-MedicalLog *ml_create(void);                                   /* NULL if out of memory */
-void        ml_destroy(MedicalLog *log);
-void        ml_clear(MedicalLog *log);
-int         ml_append(MedicalLog *log, const MedicalEntry *entry);   /* 0 ok, -1 no memory */
-size_t      ml_remove_animal(MedicalLog *log, const char *animal_id);  /* returns how many removed */
-size_t      ml_size(const MedicalLog *log);
-void        ml_foreach(const MedicalLog *log,                        /* oldest first */
-                       void (*callback)(const MedicalEntry *entry, void *context),
-                       void *context);
+/* Creates an empty log; returns NULL on failure */
+MedicalLog *ml_create(void);
+
+/* Releases all memory used by the log */
+void ml_destroy(MedicalLog *log);
+
+/* Removes all entries while keeping the log usable */
+void ml_clear(MedicalLog *log);
+
+/* Adds a new entry; returns 0 on success, -1 on failure */
+int ml_append(MedicalLog *log, const MedicalEntry *entry);
+
+/* Removes all entries for the given animal and returns the count */
+size_t ml_remove_animal(MedicalLog *log, const char *animal_id);
+
+/* Returns the total number of entries */
+size_t ml_size(const MedicalLog *log);
+
+/* Visits entries in insertion order (oldest first) */
+void ml_foreach(const MedicalLog *log,
+                void (*callback)(const MedicalEntry *entry, void *context),
+                void *context);
 
 #ifdef __cplusplus
 }
