@@ -233,3 +233,243 @@ class AnimalHashTable:
     @property
     def load_factor(self):
         return self._size / self._capacity
+
+
+# ======================================================================
+# BACKEND: food_queue
+# ======================================================================
+class _FoodNode:
+    __slots__ = ("data", "next")
+
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+
+class FoodQueue:
+    def __init__(self):
+        self._head = None
+        self._tail = None
+        self._size = 0
+
+    def __len__(self):
+        return self._size
+
+    def __iter__(self):
+        node = self._head
+        while node:
+            yield node.data
+            node = node.next
+
+    def enqueue(self, offer):
+        """Add an offer at the tail. O(1)."""
+        node = _FoodNode(offer)
+        if self._tail is None:
+            self._head = self._tail = node
+        else:
+            self._tail.next = node
+            self._tail = node
+        self._size += 1
+
+    def dequeue(self):
+        """Remove and return the oldest offer. O(1)."""
+        if self._head is None:
+            raise IndexError("dequeue from an empty queue")
+        node = self._head
+        self._head = node.next
+        if self._head is None:
+            self._tail = None
+        self._size -= 1
+        return node.data
+
+    def peek(self):
+        """Return the oldest offer without removing it, or None if empty."""
+        return self._head.data if self._head else None
+
+    def remove(self, offer_id):
+        """Remove an offer from anywhere in the queue (e.g. cancelled). O(n)."""
+        prev, node = None, self._head
+        while node:
+            if node.data["Offer ID"] == offer_id:
+                if prev:
+                    prev.next = node.next
+                else:
+                    self._head = node.next
+                if node is self._tail:
+                    self._tail = prev
+                self._size -= 1
+                return True
+            prev, node = node, node.next
+        return False
+
+    def to_list(self):
+        return list(self)
+
+
+# ======================================================================
+# BACKEND: medical_log
+# ======================================================================
+class _LogNode:
+    __slots__ = ("entry", "next")
+
+    def __init__(self, entry):
+        self.entry = entry
+        self.next = None
+
+
+class MedicalLog:
+    def __init__(self):
+        self._head = None
+        self._tail = None
+        self._size = 0
+
+    def __len__(self):
+        return self._size
+
+    def __iter__(self):
+        """Oldest entry first."""
+        node = self._head
+        while node:
+            yield node.entry
+            node = node.next
+
+    def append(self, entry):
+        node = _LogNode(entry)
+        if self._tail is None:
+            self._head = self._tail = node
+        else:
+            self._tail.next = node
+            self._tail = node
+        self._size += 1
+
+    def to_list(self, newest_first=True):
+        entries = list(self)
+        return entries[::-1] if newest_first else entries
+
+    def for_animal(self, animal_id, newest_first=True):
+        entries = [e for e in self if e["Animal ID"] == animal_id]
+        return entries[::-1] if newest_first else entries
+
+    def remove_animal(self, animal_id):
+        """Unlink every entry of one animal (used when the animal record is deleted). Returns the count."""
+        removed = 0
+        previous = None
+        node = self._head
+        while node:
+            following = node.next
+            if node.entry["Animal ID"] == animal_id:
+                if previous is None:
+                    self._head = following
+                else:
+                    previous.next = following
+                removed += 1
+            else:
+                previous = node
+            node = following
+        self._tail = previous
+        self._size -= removed
+        return removed
+
+
+# ======================================================================
+# BACKEND: route_graph
+# ======================================================================
+INFINITY = float("inf")
+
+
+class RouteGraph:
+    def __init__(self):
+        self._adj = {}
+
+    # ---- building the map ----------------------------------------------------
+    def add_location(self, name):
+        self._adj.setdefault(name, {})
+
+    def add_road(self, a, b, km):
+        """Add (or update) a two-way road between two locations."""
+        if a == b:
+            raise ValueError("A road must connect two different locations.")
+        if km <= 0:
+            raise ValueError("Distance must be greater than zero.")
+        self.add_location(a)
+        self.add_location(b)
+        self._adj[a][b] = float(km)
+        self._adj[b][a] = float(km)
+
+    def has_location(self, name):
+        return name in self._adj
+
+    def locations(self):
+        return sorted(self._adj)
+
+    def roads(self):
+        """Each road once, as (a, b, km) with a < b."""
+        seen = []
+        for a, neighbours in self._adj.items():
+            for b, km in neighbours.items():
+                if a < b:
+                    seen.append((a, b, km))
+        return sorted(seen)
+
+    # ---- shortest path -------------------------------------------------------
+    def _dijkstra(self, start):
+        dist = {node: INFINITY for node in self._adj}
+        prev = {}
+        dist[start] = 0.0
+        heap = MinHeap([(0.0, start)])
+        while len(heap):
+            d, node = heap.pop()
+            if d > dist[node]:           # stale heap entry, a shorter route was already found
+                continue
+            for neighbour, km in self._adj[node].items():
+                candidate = d + km
+                if candidate < dist[neighbour]:
+                    dist[neighbour] = candidate
+                    prev[neighbour] = node
+                    heap.push((candidate, neighbour))
+        return dist, prev
+
+    def shortest_path(self, start, end):
+        """Return (distance_km, [locations...]) or None if there is no route."""
+        if start not in self._adj or end not in self._adj:
+            raise ValueError("Both locations must exist on the map.")
+        dist, prev = self._dijkstra(start)
+        if dist[end] == INFINITY:
+            return None
+        path = [end]
+        while path[-1] != start:
+            path.append(prev[path[-1]])
+        path.reverse()
+        return dist[end], path
+
+    # ---- multi-stop tour -----------------------------------------------------
+    def tour(self, start, stops):
+        """Visit every stop using the nearest-neighbour heuristic (a fast, good-enough greedy).
+
+        From the current position, always drive to the closest stop not yet visited.
+        This is NOT guaranteed optimal (that is the travelling-salesman problem), but it is
+        simple and sensible for a handful of rescue calls.
+        Returns {"order", "legs", "total_km", "unreachable"}.
+        """
+        if start not in self._adj:
+            raise ValueError("Starting point must exist on the map.")
+        remaining = [s for s in dict.fromkeys(stops) if s != start and s in self._adj]
+        current, legs, total, order, unreachable = start, [], 0.0, [start], []
+        while remaining:
+            dist, prev = self._dijkstra(current)
+            reachable = [s for s in remaining if dist[s] < INFINITY]
+            if not reachable:
+                unreachable.extend(remaining)
+                break
+            nxt = min(reachable, key=lambda s: dist[s])
+            path = [nxt]
+            while path[-1] != current:
+                path.append(prev[path[-1]])
+            path.reverse()
+            legs.append({"from": current, "to": nxt, "km": dist[nxt], "path": path})
+            total += dist[nxt]
+            order.append(nxt)
+            remaining.remove(nxt)
+            current = nxt
+        return {"order": order, "legs": legs, "total_km": total, "unreachable": unreachable}
+
