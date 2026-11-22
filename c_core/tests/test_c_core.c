@@ -371,6 +371,7 @@ int main(void)
     test_queue_is_fifo();
     test_queue_remove_head_middle_tail_and_find();
     test_medical_log_keeps_order();
+    test_medical_log_lifecycle();
     test_medical_log_remove_animal();
     test_graph_shortest_path_prefers_the_detour();
     test_graph_edge_cases();
