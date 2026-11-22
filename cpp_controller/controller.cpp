@@ -812,7 +812,7 @@ void StrayCareController::add_road(const std::string &a_in, const std::string &b
 // dashboard
 // =========================================================================================
 
-std::vector<ActivityItem> StrayCareController::recent_activity(size_t limit) const
+std::vector<ActivityItem> std::vector<ActivityItem> StrayCareController::recent_activity(std::size_t limit) const const
 {
     size_t count = std::min(limit, activity_.size());
     return std::vector<ActivityItem>(activity_.begin(), activity_.begin() + static_cast<std::ptrdiff_t>(count));
