@@ -75,6 +75,8 @@ size_t ml_remove_animal(MedicalLog *log, const char *animal_id)
 
 size_t ml_size(const MedicalLog *log)
 {
+    if(log ==NULL)
+        return 0;
     return log->size;
 }
 
