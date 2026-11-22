@@ -553,6 +553,7 @@ std::array<long, 4> StrayCareController::urgency_counts() const
 // food donations (queue)
 // =========================================================================================
 
+
 FoodOffer StrayCareController::add_food_offer(const std::string &donor_in, const std::string &food_in,
                                               long long servings, const std::string &pickup_in,
                                               bool safety_confirmed)
@@ -560,17 +561,28 @@ FoodOffer StrayCareController::add_food_offer(const std::string &donor_in, const
     std::string donor = clean(donor_in, "Donor / organization");
     std::string food = clean(food_in, "Food description");
     std::string pickup = clean(pickup_in, "Pickup area");
-    if (servings < 1 || servings > 10000) throw ValidationError("Servings must be between 1 and 10,000.");
-    if (!safety_confirmed) throw ValidationError("Please confirm the food-safety check before listing the offer.");
+
+    if (servings < 1 || servings > 10000)
+        throw ValidationError("Servings must be between 1 and 10,000.");
+    if (!safety_confirmed)
+        throw ValidationError("Please confirm the food-safety check before listing the offer.");
 
     FoodOffer offer = make_offer("FD-" + std::to_string(next_food_no_), donor, food,
                                  static_cast<long>(servings), pickup, "Available");
-    next_food_no_++;
+
     food_offers_.push_back(offer);
-    if (fq_enqueue(food_queue_.get(), &offer) != 0) throw std::bad_alloc();
+
+    if (fq_enqueue(food_queue_.get(), &offer) != 0) {
+        food_offers_.pop_back();
+        throw std::bad_alloc();
+    }
+
+    next_food_no_++;
     log("Food donation listed", std::string(offer.offer_id) + BULLET + donor, "Available");
+
     return offer;
 }
+
 
 FoodOffer StrayCareController::update_food_status(const std::string &offer_id, const std::string &new_status)
 {
