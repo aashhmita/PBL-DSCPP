@@ -14,6 +14,8 @@ MedicalLog *ml_create(void)
 
 void ml_clear(MedicalLog *log)
 {
+    if(log == NULL)
+        return;
     MlNode *node = log->head;
     while (node) {
         MlNode *next = node->next;
