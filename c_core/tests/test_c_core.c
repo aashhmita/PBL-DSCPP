@@ -247,6 +247,37 @@ static void test_medical_log_keeps_order(void)
     ml_destroy(log);
 }
 
+static void test_medical_log_lifecycle(void)
+{
+    MedicalLog *log = ml_create();
+    CHECK(log != NULL);
+
+    if (log == NULL)
+        return;
+
+    CHECK(log->head == NULL);
+    CHECK(log->tail == NULL);
+    CHECK(ml_size(log) == 0);
+
+    MedicalEntry e;
+    memset(&e, 0, sizeof e);
+    sc_copy(e.animal_id, sizeof e.animal_id, "SC-101");
+
+    CHECK(ml_append(log, &e) == 0);
+    CHECK(ml_size(log) == 1);
+
+    ml_clear(log);
+    CHECK(log->head == NULL);
+    CHECK(log->tail == NULL);
+    CHECK(ml_size(log) == 0);
+
+    CHECK(ml_append(log, &e) == 0);
+    CHECK(ml_size(log) == 1);
+
+    ml_destroy(log);
+    ml_destroy(NULL);
+}
+
 static void test_medical_log_invalid_inputs(void)
 {
     MedicalLog *log = ml_create();
