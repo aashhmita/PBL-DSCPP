@@ -35,6 +35,8 @@ void ml_destroy(MedicalLog *log)
 
 int ml_append(MedicalLog *log, const MedicalEntry *entry)
 {
+    if (log == NULL || entry == NULL)
+        return -1;
     MlNode *node = malloc(sizeof *node);
     if (!node) return -1;
     node->entry = *entry;
