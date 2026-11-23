@@ -13,7 +13,7 @@ extern "C" {
 #define RG_ERR_DISTANCE  (-3)  
 
 typedef struct RgEdge {
-    int to;                      /* index of the neighbour */
+    int to;                    
     double km;
     struct RgEdge *next;
 } RgEdge;
