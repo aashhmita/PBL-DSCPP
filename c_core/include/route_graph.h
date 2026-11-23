@@ -51,7 +51,7 @@ void        rg_foreach_road(const RouteGraph *graph,
 int         rg_dijkstra(const RouteGraph *graph, int src, double *dist, int *prev);
 
 /* Shortest path between two nodes. path_out must hold node_count entries.
- * Returns 0 and fills *km, path_out[0..*path_len) (start first);  1 if no route;  -1 on error. */
+
 int         rg_shortest_path(const RouteGraph *graph, int from, int to,
                              double *km, int *path_out, int *path_len);
 
