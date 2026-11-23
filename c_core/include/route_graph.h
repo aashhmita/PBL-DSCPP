@@ -47,9 +47,7 @@ void        rg_foreach_road(const RouteGraph *graph,
                             void (*callback)(const char *a, const char *b, double km, void *context),
                             void *context);
 
-/* Shortest distance from node src to EVERY node. dist[] and prev[] must hold node_count entries.
- * Unreachable nodes get dist = HUGE_VAL (infinity); prev[] is -1 for src and unreachable nodes.
- * Returns 0, or -1 if out of memory. */
+
 int         rg_dijkstra(const RouteGraph *graph, int src, double *dist, int *prev);
 
 /* Shortest path between two nodes. path_out must hold node_count entries.
