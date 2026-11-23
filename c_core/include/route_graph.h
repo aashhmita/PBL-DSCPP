@@ -30,7 +30,7 @@ typedef struct {
     int capacity;
 } RouteGraph;
 
-RouteGraph *rg_create(void);                                   /* NULL if out of memory */
+RouteGraph *rg_create(void);                               
 void        rg_destroy(RouteGraph *graph);
 void        rg_clear(RouteGraph *graph);
 
