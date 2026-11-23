@@ -34,7 +34,7 @@ RouteGraph *rg_create(void);
 void        rg_destroy(RouteGraph *graph);
 void        rg_clear(RouteGraph *graph);
 
-int         rg_add_location(RouteGraph *graph, const char *name);   /* index of the node, or -1 */
+int         rg_add_location(RouteGraph *graph, const char *name);  
 int         rg_find(const RouteGraph *graph, const char *name);     /* index, or -1 if unknown  */
 int         rg_node_count(const RouteGraph *graph);
 const char *rg_node_name(const RouteGraph *graph, int index);
