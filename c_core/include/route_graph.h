@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 #define RG_ERR_NOMEM     (-1)
-#define RG_ERR_SAME      (-2)   /* a road must join two different places */
+#define RG_ERR_SAME      (-2)   
 #define RG_ERR_DISTANCE  (-3)   /* distance must be greater than zero    */
 
 typedef struct RgEdge {
