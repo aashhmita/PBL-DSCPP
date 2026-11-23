@@ -10,7 +10,7 @@ extern "C" {
 
 #define RG_ERR_NOMEM     (-1)
 #define RG_ERR_SAME      (-2)   
-#define RG_ERR_DISTANCE  (-3)   /* distance must be greater than zero    */
+#define RG_ERR_DISTANCE  (-3)  
 
 typedef struct RgEdge {
     int to;                      /* index of the neighbour */
