@@ -1,9 +1,4 @@
-/* route_graph.h : weighted, undirected graph of locations + Dijkstra's shortest path.
- *
- * Representation: an array of nodes (one per location); each node owns a linked list of edges
- * {neighbour index, distance in km}. A road A-B is stored twice (A->B and B->A).
- * Dijkstra settles the closest unsettled location first, using a min-heap:  O((V + E) log V).
- */
+
 #ifndef ROUTE_GRAPH_H
 #define ROUTE_GRAPH_H
 
