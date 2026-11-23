@@ -20,7 +20,7 @@ typedef struct RgEdge {
 
 typedef struct {
     char name[SC_TEXT_LEN];
-    RgEdge *first;               /* edges in the order they were added */
+    RgEdge *first;              
     RgEdge *last;
 } RgNode;
 
